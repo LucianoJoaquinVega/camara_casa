@@ -1,0 +1,90 @@
+index.html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cámara de seguridad</title>
+<style>
+body {
+  background: #10151e;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+h1 { color: #43dc86; }
+.panel {
+  background: #202c40;
+  padding: 25px;
+  border-radius: 18px;
+  max-width: 700px;
+  margin: auto;
+}
+input, button {
+  padding: 14px;
+  margin: 8px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+}
+button {
+  background: #43dc86;
+  cursor: pointer;
+}
+img {
+  max-width: 100%;
+  margin-top: 20px;
+}
+</style>
+</head>
+<body>
+<h1>🏠 Cámara de seguridad</h1>
+<div class="panel">
+  <p id="estado">Estado: esperando conexión</p>
+  <form id="formulario">
+    <input id="direccion" type="url"
+      placeholder="Dirección de la cámara" required>
+    <button type="submit">Conectar</button>
+  </form>
+  <h2>Imagen de la cámara</h2>
+  <img id="foto" hidden alt="Imagen de la cámara">
+  <p id="mensaje">Ingresá la dirección de la cámara.</p>
+</div>
+<script>
+const formulario = document.getElementById("formulario");
+const direccion = document.getElementById("direccion");
+const foto = document.getElementById("foto");
+const estado = document.getElementById("estado");
+const mensaje = document.getElementById("mensaje");
+let temporizador;
+
+formulario.addEventListener("submit", function(e) {
+  e.preventDefault();
+  const url = direccion.value.trim().replace(/\/+$/, "");
+  clearInterval(temporizador);
+
+  function cargarFoto() {
+    const imagen = new Image();
+    imagen.onload = function() {
+      foto.src = imagen.src;
+      foto.hidden = false;
+      mensaje.hidden = true;
+      estado.textContent = "Estado: imagen recibida";
+    };
+    imagen.onerror = function() {
+      estado.textContent = "No se pudo recibir la imagen";
+      mensaje.hidden = false;
+      mensaje.textContent =
+        "Verificá la conexión y la dirección de la cámara.";
+    };
+    imagen.src = url + "/capture?t=" + Date.now();
+  }
+
+  estado.textContent = "Estado: conectando...";
+  cargarFoto();
+  temporizador = setInterval(cargarFoto, 5000);
+});
+</script>
+</body>
+</html>
